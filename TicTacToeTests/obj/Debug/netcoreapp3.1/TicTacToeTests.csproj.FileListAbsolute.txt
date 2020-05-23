@@ -92,3 +92,6 @@ C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\obj\Debug\netcoreapp3.1
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\obj\Debug\netcoreapp3.1\TicTacToeTests.dll
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\obj\Debug\netcoreapp3.1\TicTacToeTests.pdb
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\obj\Debug\netcoreapp3.1\TicTacToeTests.genruntimeconfig.cache
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\bin\Debug\netcoreapp3.1\TicTacToe.exe
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\bin\Debug\netcoreapp3.1\TicTacToe.dll
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\bin\Debug\netcoreapp3.1\TicTacToe.pdb

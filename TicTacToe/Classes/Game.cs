@@ -21,7 +21,7 @@ namespace TicTacToe.Classes
         }
 
         private int _boardSize;
-        private readonly char[] allowedChars = { 'X', 'O' };
+        public readonly char[] AllowedChars = { 'X', 'O' };
 
         private int _turnsCount;
         public int Turns
@@ -36,6 +36,16 @@ namespace TicTacToe.Classes
             }
         }
 
+        public char CurrentPlayer
+        {
+            get
+            {
+                return AllowedChars[_turnsCount % 2];
+            }
+        }
+
+        public bool GameOver { get; set; }
+
         public Action<char[]> Render { get; set; }
 
         Game(int boardSize, Action<char[]> renderAction)
@@ -43,7 +53,11 @@ namespace TicTacToe.Classes
             _boardSize = boardSize;
             Render = renderAction;
             _turnsCount = 0;
-            initBoard();
+            GameOver = false;
+            _board = new char[_boardSize * _boardSize];
+
+
+            Render?.Invoke(Board);
         }
 
         public static Game CreateInstance(int boardSize, Action<char[]> renderAction)
@@ -55,20 +69,14 @@ namespace TicTacToe.Classes
             return new Game(boardSize, renderAction);
         }
 
-
-        private void initBoard()
-        {
-            _board = new char[_boardSize];
-        }
-
         public GameResult PlayerTurn(int index, char playerChar)
         {
             if (index > (_boardSize * _boardSize) - 1) throw new ArgumentException($"index {index }is bigger than the board size of {_boardSize}");
-            if (!allowedChars.Contains(playerChar)) throw new ArgumentException($"playerChar of {playerChar} is not one of {new string(allowedChars).Split(",")}");
+            if (!AllowedChars.Contains(playerChar)) throw new ArgumentException($"playerChar of {playerChar} is not one of {new string(AllowedChars).Split(",")}");
 
             _turnsCount++;
             _board[index] = playerChar;
-            Render?.Invoke(_board);
+            Render?.Invoke(Board);
 
             // now test if player won
             if (_turnsCount > 4)
@@ -78,7 +86,11 @@ namespace TicTacToe.Classes
                 {
                     var row = _board.Skip(i * _boardSize).Take(_boardSize).ToList();
                     var check = isWinner(row, i, Direction.Row);
-                    if (check.HasWinner) return check;
+                    if (check.HasWinner)
+                    {
+                        GameOver = true;
+                        return check;
+                    }
 
                     var column = new List<char>();
                     for (int c = i; c < _boardSize*_boardSize; c = c + _boardSize)
@@ -86,7 +98,11 @@ namespace TicTacToe.Classes
                         column.Add(_board[c]);
                     }
                     check = isWinner(column, i, Direction.Column);
-                    if (check.HasWinner) return check;
+                    if (check.HasWinner)
+                    {
+                        GameOver = true;
+                        return check;
+                    }
 
                     if (i == 0)
                         diag.Add(_board[0]);
@@ -94,14 +110,22 @@ namespace TicTacToe.Classes
                 }
 
                 var diagCheck = isWinner(diag, 0, Direction.Diagonal);
-                if (diagCheck.HasWinner) return diagCheck;
+                if (diagCheck.HasWinner)
+                {
+                    GameOver = true;
+                    return diagCheck;
+                }
+            }
+            if (Turns == _boardSize * _boardSize)
+            {
+                GameOver = true;
             }
             return new GameResult { HasWinner = false, Winner = null, WinningDirection = Direction.None, WinningIndex = null };
         }
 
         private GameResult isWinner(List<char> lineToCheck, int index, Direction direction)
         {
-            foreach (var item in allowedChars)
+            foreach (var item in AllowedChars)
             {
                 var c = lineToCheck.Where(x => x == item);
                 if (c.Count() == _boardSize) return new GameResult() { HasWinner = true, Winner = item, WinningDirection = direction, WinningIndex = index };

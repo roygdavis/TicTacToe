@@ -85,7 +85,6 @@ C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\bin\Debug\netcoreapp3.1
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\bin\Debug\netcoreapp3.1\zh-Hant\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\bin\Debug\netcoreapp3.1\zh-Hant\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\obj\Debug\netcoreapp3.1\TicTacToeTests.csprojAssemblyReference.cache
-C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\obj\Debug\netcoreapp3.1\TicTacToeTests.csproj.CoreCompileInputs.cache
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\obj\Debug\netcoreapp3.1\TicTacToeTests.AssemblyInfoInputs.cache
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\obj\Debug\netcoreapp3.1\TicTacToeTests.AssemblyInfo.cs
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\obj\Debug\netcoreapp3.1\TicTacToeTests.csproj.CopyComplete
@@ -95,3 +94,6 @@ C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\obj\Debug\netcoreapp3.1
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\bin\Debug\netcoreapp3.1\TicTacToe.exe
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\bin\Debug\netcoreapp3.1\TicTacToe.dll
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\bin\Debug\netcoreapp3.1\TicTacToe.pdb
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\bin\Debug\netcoreapp3.1\Castle.Core.dll
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\bin\Debug\netcoreapp3.1\Moq.dll
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\obj\Debug\netcoreapp3.1\TicTacToeTests.csproj.CoreCompileInputs.cache

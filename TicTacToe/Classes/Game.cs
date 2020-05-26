@@ -7,128 +7,106 @@ namespace TicTacToe.Classes
 {
     public class Game
     {
-        private char[] _board;
-        public char[] Board
+        public IGameDetails GameDetails { get; set; }
+
+        public IRenderer Renderer { get; set; }
+
+        public Game()
         {
-            get
-            {
-                return _board;
-            }
-            set
-            {
-                _board = value;
-            }
+            GameDetails = new GameDetails();
         }
 
-        private int _boardSize;
-        public readonly char[] AllowedChars = { 'X', 'O' };
-
-        private int _turnsCount;
-        public int Turns
+        Game(IGameDetails gameDetails, IRenderer renderer)
         {
-            get
-            {
-                return _turnsCount;
-            }
-            set
-            {
-                _turnsCount = value;
-            }
+            GameDetails = gameDetails;
+            Renderer = renderer;
+            Renderer?.Render(gameDetails);
         }
 
-        public char CurrentPlayer
+        public static Game CreateInstance(IRenderer renderer)
         {
-            get
-            {
-                return AllowedChars[_turnsCount % 2];
-            }
-        }
-
-        public bool GameOver { get; set; }
-
-        public Action<char[]> Render { get; set; }
-
-        Game(int boardSize, Action<char[]> renderAction)
-        {
-            _boardSize = boardSize;
-            Render = renderAction;
-            _turnsCount = 0;
-            GameOver = false;
-            _board = new char[_boardSize * _boardSize];
-
-
-            Render?.Invoke(Board);
-        }
-
-        public static Game CreateInstance(int boardSize, Action<char[]> renderAction)
-        {
-            if (boardSize < 3 || boardSize % 2 == 0)
+            var gameDetails = renderer.RenderStart();
+            if (gameDetails.BoardSize < 3 || gameDetails.BoardSize % 2 == 0)
             {
                 throw new ArgumentException("boardSize must be 3 or more and an odd number");
             }
-            return new Game(boardSize, renderAction);
+            return new Game(gameDetails, renderer);
+        }
+
+        public void Play()
+        {
+            while(!GameDetails.GameOver)
+            {
+                PlayerTurn pt = Renderer.RenderTurn(GameDetails);
+                var gameResult = PlayerTurn(pt.Index, pt.PlayerChar);
+                if (gameResult.HasWinner)
+                {
+                    Renderer?.RenderWin(gameResult);
+                }
+            }
+            Renderer?.RenderEnd();
         }
 
         public GameResult PlayerTurn(int index, char playerChar)
         {
-            if (index > (_boardSize * _boardSize) - 1) throw new ArgumentException($"index {index }is bigger than the board size of {_boardSize}");
-            if (!AllowedChars.Contains(playerChar)) throw new ArgumentException($"playerChar of {playerChar} is not one of {new string(AllowedChars).Split(",")}");
+            if (index > (GameDetails.BoardSize * GameDetails.BoardSize) - 1) throw new ArgumentException($"index {index} is bigger than the board size of {GameDetails.BoardSize}");
+            if (!GameDetails.AllowedChars.Contains(playerChar)) throw new ArgumentException($"playerChar of {playerChar} is not one of {new string(GameDetails.AllowedChars).Split(",")}");
 
-            _turnsCount++;
-            _board[index] = playerChar;
-            Render?.Invoke(Board);
+            GameDetails.Turns++;
+            GameDetails.Board[index] = playerChar;
+            Renderer?.Render(GameDetails);
 
             // now test if player won
-            if (_turnsCount > 4)
+            if (GameDetails.Turns > 4)
             {
                 var diag = new List<char>();
-                for (int i = 0; i < _boardSize; i++)
+                for (int i = 0; i < GameDetails.BoardSize; i++)
                 {
-                    var row = _board.Skip(i * _boardSize).Take(_boardSize).ToList();
+                    var row = GameDetails.Board.Skip(i * GameDetails.BoardSize).Take(GameDetails.BoardSize).ToList();
                     var check = isWinner(row, i, Direction.Row);
                     if (check.HasWinner)
                     {
-                        GameOver = true;
+                        GameDetails.GameOver = true;
                         return check;
                     }
 
                     var column = new List<char>();
-                    for (int c = i; c < _boardSize*_boardSize; c = c + _boardSize)
+                    for (int c = i; c < GameDetails.BoardSize*GameDetails.BoardSize; c = c + GameDetails.BoardSize)
                     {
-                        column.Add(_board[c]);
+                        column.Add(GameDetails.Board[c]);
                     }
                     check = isWinner(column, i, Direction.Column);
                     if (check.HasWinner)
                     {
-                        GameOver = true;
+                        GameDetails.GameOver = true;
                         return check;
                     }
 
                     if (i == 0)
-                        diag.Add(_board[0]);
-                    else diag.Add(_board[(i * _boardSize) + i]);
+                        diag.Add(GameDetails.Board[0]);
+                    else diag.Add(GameDetails.Board[(i * GameDetails.BoardSize) + i]);
                 }
 
                 var diagCheck = isWinner(diag, 0, Direction.Diagonal);
                 if (diagCheck.HasWinner)
                 {
-                    GameOver = true;
+                    GameDetails.GameOver = true;
                     return diagCheck;
                 }
             }
-            if (Turns == _boardSize * _boardSize)
+            if (GameDetails.Turns == GameDetails.BoardSize * GameDetails.BoardSize)
             {
-                GameOver = true;
+                GameDetails.GameOver = true;
             }
             return new GameResult { HasWinner = false, Winner = null, WinningDirection = Direction.None, WinningIndex = null };
         }
 
         private GameResult isWinner(List<char> lineToCheck, int index, Direction direction)
         {
-            foreach (var item in AllowedChars)
+            foreach (var item in GameDetails.AllowedChars)
             {
                 var c = lineToCheck.Where(x => x == item);
-                if (c.Count() == _boardSize) return new GameResult() { HasWinner = true, Winner = item, WinningDirection = direction, WinningIndex = index };
+                if (c.Count() == GameDetails.BoardSize) return new GameResult() { HasWinner = true, Winner = item, WinningDirection = direction, WinningIndex = index };
             }
             return new GameResult() { HasWinner = false, Winner = new char?(), WinningDirection = Direction.None, WinningIndex = new int?() };
         }

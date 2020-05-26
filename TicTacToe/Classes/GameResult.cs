@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TicTacToe.Classes
 {
-    public class GameResult
+    public class GameResult : IGameResult
     {
         public Nullable<int> WinningIndex { get; set; }
         public Direction WinningDirection { get; set; }

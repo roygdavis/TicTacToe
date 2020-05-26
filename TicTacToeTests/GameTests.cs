@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
 using TicTacToe.Classes;
+using Moq;
 
 namespace TicTacToeTests
 {
@@ -15,8 +16,12 @@ namespace TicTacToeTests
         [DataRow(2)]
         public void Game_IfBoardSizeIsLessThan3_ShouldThrowException(int boardSize)
         {
-            // Arrange/Act/Assert
-            Assert.ThrowsException<ArgumentException>(() => Game.CreateInstance(boardSize, null));
+            // Arrange
+            var moqRenderer = new Mock<IRenderer>();
+            moqRenderer.Setup(x => x.RenderStart()).Returns(new GameDetails(boardSize));
+
+            //Act/Assert
+            Assert.ThrowsException<ArgumentException>(() => Game.CreateInstance(moqRenderer.Object));
         }
 
         [TestMethod]
@@ -25,8 +30,12 @@ namespace TicTacToeTests
         [DataRow(100)]
         public void Game_IfBoardSizeNotOddNumber_ShouldThrowException(int boardSize)
         {
-            // Arrange/Act/Assert
-            Assert.ThrowsException<ArgumentException>(() => Game.CreateInstance(boardSize, null));
+            // Arrange
+            var moqRenderer = new Mock<IRenderer>();
+            moqRenderer.Setup(x => x.RenderStart()).Returns(new GameDetails(boardSize));
+
+            // Act/Assert
+            Assert.ThrowsException<ArgumentException>(() => Game.CreateInstance(moqRenderer.Object));
         }
 
         [TestMethod]
@@ -36,7 +45,10 @@ namespace TicTacToeTests
         public void Game_IfBoardSizeIsValid_ShouldNotThrowException(int boardSize)
         {
             // Arrange/Act
-            var o = Game.CreateInstance(boardSize, null);
+            var moqRenderer = new Mock<IRenderer>();
+            moqRenderer.Setup(x => x.RenderStart()).Returns(new GameDetails());
+
+            var o = Game.CreateInstance(moqRenderer.Object);
 
             //Assert
             Assert.IsTrue(o is Game);
@@ -88,9 +100,15 @@ namespace TicTacToeTests
         public void Game_PlayerTurn_WhenWinningTurn_HasWinner_ShouldBeTrue(char[] board, int nextMoveIndex, int expectedWinningIndex, Direction expectedDirection, char expectedWinningChar)
         {
             // Arrange
-            var sut = Game.CreateInstance((int)Math.Sqrt((double)board.Length), null);
-            sut.Board = board;
-            sut.Turns = board.Count(x => x != ' ');
+            var moqGameDetails = new GameDetails();
+            moqGameDetails.Board = board;
+            moqGameDetails.BoardSize = (int)Math.Sqrt((double)board.Length);
+            moqGameDetails.Turns = board.Count(x => x == 'X' || x == 'O');
+
+            var moqRenderer = new Mock<IRenderer>();
+            moqRenderer.Setup(x => x.RenderStart()).Returns(moqGameDetails);
+
+            var sut = Game.CreateInstance(moqRenderer.Object);
 
             // Act
             var result = sut.PlayerTurn(nextMoveIndex, expectedWinningChar);
@@ -102,6 +120,22 @@ namespace TicTacToeTests
             Assert.IsTrue(result.WinningIndex == expectedWinningIndex);
             Assert.IsTrue(result.WinningDirection == expectedDirection);
             Assert.AreEqual(expectedWinningChar, result.Winner.Value);
+        }
+
+        [TestMethod]
+        [DataRow(9)]
+        [DataRow(19)]
+        [DataRow(99)]
+        public void Game_WhenGameDetailsTurnsIsGreaterThanBoardSize_ShouldThrowException(int boardSize)
+        {
+            // Arrange
+            var moqGameDetails = new Mock<IGameDetails>();
+            moqGameDetails.Setup(x => x.BoardSize).Returns(boardSize);
+            moqGameDetails.Setup(x => x.Turns).Returns(boardSize * boardSize);
+            var sut = new Game() { GameDetails = moqGameDetails.Object };
+
+            // Act/Assert
+            Assert.ThrowsException<ArgumentException>(() => sut.PlayerTurn(1, 'X'));
         }
     }
 }

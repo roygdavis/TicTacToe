@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TicTacToeLibrary.Models;
+using TicTacToeLibrary.Services;
 
-namespace TicTacToe.Classes
+namespace TicTacToe
 {
     public class ConsoleRenderer : IRenderer
     {
-        public void Render(IGameDetails gameDetails)
+        public void Render(IGameState gameDetails)
         {
 
             Console.WriteLine();
@@ -32,7 +34,7 @@ namespace TicTacToe.Classes
             return false; // TODO: return true to play again
         }
 
-        public IGameDetails RenderStart()
+        public IGameState RenderStart()
         {
             bool sizeParsed = false;
             while (!sizeParsed)
@@ -45,17 +47,17 @@ namespace TicTacToe.Classes
                 {
                     // TODO: get players to choose their characters!
                     Console.WriteLine();
-                    return new GameDetails(boardSize);
+                    return new GameState(boardSize);
                 }
                 else
                 {
                     Console.WriteLine("I didn't understand that. Please try again");
                 }
             }
-            return null;
+            return new GameState();
         }
 
-        public PlayerTurn RenderTurn(IGameDetails gameDetails)
+        public PlayerTurn RenderTurn(IGameState gameDetails)
         {
             bool indexParsed = false;
             while (!indexParsed)
@@ -75,7 +77,7 @@ namespace TicTacToe.Classes
             return null;
         }
 
-        public void RenderWin(IGameResult gameResult)
+        public void RenderWin(ITurnResult gameResult)
         {
             if (gameResult.HasWinner)
             {

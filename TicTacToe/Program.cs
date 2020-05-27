@@ -1,5 +1,6 @@
 ﻿using System;
-using TicTacToe.Classes;
+using TicTacToeLibrary.Models;
+using TicTacToeLibrary.Services;
 
 namespace TicTacToe
 {
@@ -8,7 +9,7 @@ namespace TicTacToe
         static void Main(string[] args)
         {
             var consoleRenderer = new ConsoleRenderer();
-            var game = Game.CreateInstance(consoleRenderer);
+            var game = GameService.CreateInstance(consoleRenderer);
             game.Play();
 
             //    var nowinner = true;

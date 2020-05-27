@@ -11,3 +11,6 @@ C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\obj\Debug\netcoreapp3.1\TicT
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\obj\Debug\netcoreapp3.1\TicTacToe.pdb
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\obj\Debug\netcoreapp3.1\TicTacToe.genruntimeconfig.cache
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\obj\Debug\netcoreapp3.1\TicTacToe.csprojAssemblyReference.cache
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\bin\Debug\netcoreapp3.1\TicTacToeLibrary.dll
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\bin\Debug\netcoreapp3.1\TicTacToeLibrary.pdb
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\obj\Debug\netcoreapp3.1\TicTacToe.csproj.CopyComplete

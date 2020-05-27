@@ -18,37 +18,26 @@ namespace TicTacToeTests
         [DataRow(-1)]
         [DataRow(0)]
         [DataRow(2)]
-        public void Play_IfBoardSizeIsLessThan3_ShouldThrowException(int boardSize)
+        public void CreateState_IfBoardSizeIsLessThan3_ShouldThrowException(int boardSize)
         {
             // Arrange
-            var moqRenderer = new Mock<IRenderer>();
-            moqRenderer.Setup(x => x.RenderStart()).Returns(new GameState(boardSize));
-            var gameService = GameService.CreateInstance(moqRenderer.Object);
+            var sut = new GameService();
 
             //Act/Assert
-            Assert.ThrowsException<ArgumentException>(() => gameService.Play());
+            Assert.ThrowsException<ArgumentException>(() => sut.CreateState(boardSize));
         }
 
         [TestMethod]
         [DataRow(4)]
         [DataRow(6)]
         [DataRow(100)]
-        public void Play_IfBoardSizeNotOddNumber_ShouldThrowException(int boardSize)
+        public void CreateState_IfBoardSizeNotOddNumber_ShouldThrowException(int boardSize)
         {
             // Arrange
-            var moqRenderer = new Mock<IRenderer>();
-            moqRenderer.Setup(x => x.RenderStart()).Returns(new GameState(boardSize));
-            var gameService = GameService.CreateInstance(moqRenderer.Object);
+            var sut = new GameService();
 
             // Act/Assert
-            Assert.ThrowsException<ArgumentException>(() => gameService.Play());
-        }
-
-        [TestMethod]
-        public void CreateInstance_WhenIRendererIsNull_ShouldThrowException()
-        {
-            // Arrange/Act/Assert
-            Assert.ThrowsException<ArgumentException>(() => GameService.CreateInstance(null));
+            Assert.ThrowsException<ArgumentException>(() => sut.CreateState(boardSize));
         }
 
         [TestMethod]
@@ -58,13 +47,12 @@ namespace TicTacToeTests
         public void CreateInstance_IfRendererReturnsValidGameState_ShouldNotThrowException(int boardSize)
         {
             // Arrange/Act
-            var moqRenderer = new Mock<IRenderer>();
-            moqRenderer.Setup(x => x.RenderStart()).Returns(new GameState());
-
-            var o = GameService.CreateInstance(moqRenderer.Object);
+            var sut = new GameService();
+            var gs = sut.CreateState(boardSize);
 
             //Assert
-            Assert.IsTrue(o is GameService);
+            Assert.IsTrue(sut is GameService);
+            Assert.IsTrue(gs is GameState);
         }
 
         [TestMethod]
@@ -116,13 +104,10 @@ namespace TicTacToeTests
             var moqGameState = new GameState((int)Math.Sqrt((double)board.Length));
             moqGameState.Board = board;
             
-            var moqRenderer = new Mock<IRenderer>();
-            moqRenderer.Setup(x => x.RenderStart()).Returns(moqGameState);
-
-            var sut = GameService.CreateInstance(moqRenderer.Object);
+            var sut = new GameService();
 
             // Act
-            var result = sut.PlayerTurn(moqGameState, nextMoveIndex, expectedWinningChar);
+            var result = sut.PlayerTurn(moqGameState, nextMoveIndex);
 
             // Assert
 

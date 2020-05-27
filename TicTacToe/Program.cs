@@ -8,21 +8,13 @@ namespace TicTacToe
     {
         static void Main(string[] args)
         {
-            var consoleRenderer = new ConsoleRenderer();
-            var game = GameService.CreateInstance(consoleRenderer);
-            game.Play();
-
-            //    var nowinner = true;
-            //    while (!game.GameOver)
-            //    {
-            //        
-            //    }
-            //    if (nowinner) Console.WriteLine("No one won that game");
-            //}
-            //else
-            //{
-            //    Console.WriteLine("Sorry, please try again with a valid number");
-            //}
+            var gameService = new GameService();
+            var consoleRenderer = new ConsoleRenderer(gameService);
+            var gameState = consoleRenderer.RenderStart();
+            while (!gameState.GameOver)
+            {
+                gameState = consoleRenderer.RenderTurn(gameState);
+            }            
         }
     }
 }

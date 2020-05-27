@@ -7,31 +7,46 @@ using TicTacToeLibrary.Services;
 
 namespace TicTacToe
 {
-    public class ConsoleRenderer : IRenderer
+    public class ConsoleRenderer : IConsoleRenderer
     {
-        public void Render(IGameState gameDetails)
+        private readonly IGameService gameService;
+
+        public ConsoleRenderer(IGameService service)
+        {
+            gameService = service;
+        }
+
+        public void RenderBoard(IGameState gameState)
         {
 
             Console.WriteLine();
-            for (int i = 0; i < gameDetails.Board.Length; i++)
+            for (int i = 0; i < gameState.Board.Length; i++)
             {
-                var ch = gameDetails.Board[i];
+                var ch = gameState.Board[i];
                 if (ch == ' ' || ch == '\0') Console.Write("-");
                 else Console.Write(ch);
-                if (i % gameDetails.BoardSize == gameDetails.BoardSize - 1) Console.WriteLine();
+                if (i % gameState.BoardSize == gameState.BoardSize - 1) Console.WriteLine();
             }
             Console.WriteLine();
         }
 
-        public void RenderDraw()
+        private void renderDraw()
         {
             Console.WriteLine("No-one won :-(");
         }
 
-        public bool RenderEnd()
+        public bool RenderEnd(IGameState gameState)
         {
+            if (gameState.GameOver && gameState.TurnResult.HasWinner)
+            {
+                renderWin(gameState);
+            }
+            else
+            {
+                renderDraw();
+            }
             Console.WriteLine("Thanks for playing!");
-            return false; // TODO: return true to play again
+            return false; // TODO: return true to play agian
         }
 
         public IGameState RenderStart()
@@ -39,15 +54,23 @@ namespace TicTacToe
             bool sizeParsed = false;
             while (!sizeParsed)
             {
-                Console.WriteLine("What size board do you want to play (enter between 3-9): ");
-                var boardSizeChar = Console.ReadKey();
+                Console.WriteLine("What size board do you want to play (must be an odd number and 3 or more): ");
+                var boardSizeChar = Console.ReadLine();
                 int boardSize;
-                sizeParsed = Int32.TryParse(boardSizeChar.KeyChar.ToString(), out boardSize);
+                sizeParsed = Int32.TryParse(boardSizeChar, out boardSize);
                 if (sizeParsed)
                 {
-                    // TODO: get players to choose their characters!
-                    Console.WriteLine();
-                    return new GameState(boardSize);
+                    try
+                    {
+                        Console.WriteLine();
+                        var g = gameService.CreateState(boardSize, null);
+                        return g;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                        sizeParsed = false;
+                    }
                 }
                 else
                 {
@@ -57,32 +80,36 @@ namespace TicTacToe
             return new GameState();
         }
 
-        public PlayerTurn RenderTurn(IGameState gameDetails)
+        public IGameState RenderTurn(IGameState gameState)
         {
             bool indexParsed = false;
             while (!indexParsed)
             {
-                Console.WriteLine($"It's {gameDetails.CurrentPlayer} turn, enter your index (0-{gameDetails.Board.Length - 1}): ");
+                RenderBoard(gameState);
+                Console.WriteLine($"It's {gameState.CurrentPlayer} turn, enter your index (0-{gameState.Board.Length - 1}): ");
                 var indexChars = Console.ReadLine();
                 int index;
                 indexParsed = Int32.TryParse(indexChars, out index);
                 if (indexParsed)
                 {
-                    if (index < 0 || index > gameDetails.Board.Length) Console.WriteLine($"Index {index} is not valid");
-                    else if (gameDetails.AllowedChars.Contains(gameDetails.Board[index])) Console.WriteLine("That space is already taken");
-                    else return new PlayerTurn { Index = index, PlayerChar = gameDetails.CurrentPlayer };
-                    indexParsed = false;
+                    try
+                    {
+                        gameState = gameService.PlayerTurn(gameState, index);
+                        return gameState;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                        indexParsed = false;
+                    }
                 }
             }
             return null;
         }
 
-        public void RenderWin(ITurnResult gameResult)
+        private void renderWin(IGameState gameState)
         {
-            if (gameResult.HasWinner)
-            {
-                Console.WriteLine($"Congratulations {gameResult.Winner}, you've won at index {gameResult.WinningIndex} in a {gameResult.WinningDirection} direction!");
-            }
+            Console.WriteLine($"Congratulations {gameState.TurnResult.Winner}, you've won at index {gameState.TurnResult.WinningIndex} in a {gameState.TurnResult.WinningDirection} direction!");
         }
     }
 }

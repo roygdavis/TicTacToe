@@ -9,51 +9,27 @@ namespace TicTacToeLibrary.Services
 {
     public class GameService : IGameService
     {
-        public IRenderer Renderer { get; set; }
-
-        GameService(IRenderer renderer)
+        public IGameState CreateState(int boardSize = 3, char[] playerChars =  null)
         {
-            Renderer = renderer;
-        }
-
-        public static GameService CreateInstance(IRenderer renderer)
-        {
-            if (renderer == null) throw new ArgumentException("renderer cannot be null");
-            return new GameService(renderer);
-        }
-
-        public void Play()
-        {
-            var gameState = Renderer.RenderStart();
-            if (gameState.BoardSize < 3 || gameState.BoardSize % 2 == 0)
+            if (boardSize < 3 || boardSize % 2 == 0)
             {
-                // TODO: move this constraint out of this service
-                // or create a service around gameDetails
                 throw new ArgumentException("boardSize must be 3 or more and an odd number");
             }
-            Renderer.Render(gameState);
-            while (!gameState.GameOver)
-            {
-                PlayerTurn pt = Renderer.RenderTurn(gameState);
-                var gameResult = PlayerTurn(gameState, pt.Index, pt.PlayerChar);
-                if (gameResult.TurnResult.HasWinner)
-                {
-                    Renderer?.RenderWin(gameResult.TurnResult);
-                }
-            }
-            Renderer.RenderEnd();
+            if (playerChars == null) playerChars = new char[] { 'X', 'O' };
+            if (playerChars.Length < 2 || playerChars.Length > 2) throw new ArgumentException("playerChars can only be a length of 2");
+            if (playerChars.Distinct().Count() == 1) throw new NotSupportedException("Each playerChar must be a unique character");
+            return new GameState(boardSize, playerChars);
         }
-
-        public IGameState PlayerTurn(IGameState gameState, int index, char playerChar)
+                
+        public IGameState PlayerTurn(IGameState gameState, int index)
         {
             if (index > (gameState.BoardSize * gameState.BoardSize) - 1) throw new ArgumentException($"index {index} is bigger than the board size of {gameState.BoardSize}");
-            if (!gameState.AllowedChars.Contains(playerChar)) throw new ArgumentException($"playerChar of {playerChar} is not one of {new string(gameState.AllowedChars).Split(",")}");
+            //if (!gameState.AllowedChars.Contains(playerChar)) throw new ArgumentException($"playerChar of {playerChar} is not one of {new string(gameState.AllowedChars).Split(",")}");
             if (gameState.Board.Count(x => gameState.AllowedChars.Contains(x)) >= gameState.Board.Length) throw new NotSupportedException("Game is over, there are no spaces left on the board.  Start a new game.");
             if (gameState.AllowedChars.Contains(gameState.Board[index])) throw new ArgumentException("That space has already been taken");
 
-            gameState.Board[index] = playerChar;
-            Renderer.Render(gameState);
-
+            gameState.Board[index] = gameState.CurrentPlayer;
+            
             // now test if player won
             if (gameState.Turns > 4)
             {

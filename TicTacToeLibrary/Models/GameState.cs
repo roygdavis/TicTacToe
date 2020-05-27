@@ -19,8 +19,6 @@ namespace TicTacToeLibrary.Models
 
         public GameState(int boardSize = 3, char[] allowedChars=null)
         {
-            if (allowedChars == null) AllowedChars = new char[] { 'X', 'O' };
-            if (boardSize < 0) boardSize = 0;
             GameOver = false;
             Board = new char[boardSize * boardSize];
         }

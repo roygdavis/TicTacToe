@@ -3,114 +3,116 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using TicTacToeLibrary.Enums;
-using TicTacToeLibrary.Repositories;
+using TicTacToeLibrary.Models;
 
 namespace TicTacToeLibrary.Services
 {
-    public class GameService
+    public class GameService : IGameService
     {
-        public IGameDetails GameDetails { get; set; }
-
         public IRenderer Renderer { get; set; }
 
-        public GameService()
+        GameService(IRenderer renderer)
         {
-            GameDetails = new GameDetails();
-        }
-
-        GameService(IGameDetails gameDetails, IRenderer renderer)
-        {
-            GameDetails = gameDetails;
             Renderer = renderer;
-            Renderer?.Render(gameDetails);
         }
 
         public static GameService CreateInstance(IRenderer renderer)
         {
-            var gameDetails = renderer.RenderStart();
-            if (gameDetails.BoardSize < 3 || gameDetails.BoardSize % 2 == 0)
-            {
-                throw new ArgumentException("boardSize must be 3 or more and an odd number");
-            }
-            return new GameService(gameDetails, renderer);
+            if (renderer == null) throw new ArgumentException("renderer cannot be null");
+            return new GameService(renderer);
         }
 
         public void Play()
         {
-            while(!GameDetails.GameOver)
+            var gameState = Renderer.RenderStart();
+            if (gameState.BoardSize < 3 || gameState.BoardSize % 2 == 0)
             {
-                PlayerTurn pt = Renderer.RenderTurn(GameDetails);
-                var gameResult = PlayerTurn(pt.Index, pt.PlayerChar);
-                if (gameResult.HasWinner)
+                // TODO: move this constraint out of this service
+                // or create a service around gameDetails
+                throw new ArgumentException("boardSize must be 3 or more and an odd number");
+            }
+            Renderer.Render(gameState);
+            while (!gameState.GameOver)
+            {
+                PlayerTurn pt = Renderer.RenderTurn(gameState);
+                var gameResult = PlayerTurn(gameState, pt.Index, pt.PlayerChar);
+                if (gameResult.TurnResult.HasWinner)
                 {
-                    Renderer?.RenderWin(gameResult);
+                    Renderer?.RenderWin(gameResult.TurnResult);
                 }
             }
-            Renderer?.RenderEnd();
+            Renderer.RenderEnd();
         }
 
-        public GameResult PlayerTurn(int index, char playerChar)
+        public IGameState PlayerTurn(IGameState gameState, int index, char playerChar)
         {
-            if (index > (GameDetails.BoardSize * GameDetails.BoardSize) - 1) throw new ArgumentException($"index {index} is bigger than the board size of {GameDetails.BoardSize}");
-            if (!GameDetails.AllowedChars.Contains(playerChar)) throw new ArgumentException($"playerChar of {playerChar} is not one of {new string(GameDetails.AllowedChars).Split(",")}");
+            if (index > (gameState.BoardSize * gameState.BoardSize) - 1) throw new ArgumentException($"index {index} is bigger than the board size of {gameState.BoardSize}");
+            if (!gameState.AllowedChars.Contains(playerChar)) throw new ArgumentException($"playerChar of {playerChar} is not one of {new string(gameState.AllowedChars).Split(",")}");
+            if (gameState.Board.Count(x => gameState.AllowedChars.Contains(x)) >= gameState.Board.Length) throw new NotSupportedException("Game is over, there are no spaces left on the board.  Start a new game.");
+            if (gameState.AllowedChars.Contains(gameState.Board[index])) throw new ArgumentException("That space has already been taken");
 
-            GameDetails.Turns++;
-            GameDetails.Board[index] = playerChar;
-            Renderer?.Render(GameDetails);
+            gameState.Board[index] = playerChar;
+            Renderer.Render(gameState);
 
             // now test if player won
-            if (GameDetails.Turns > 4)
+            if (gameState.Turns > 4)
             {
                 var diag = new List<char>();
-                for (int i = 0; i < GameDetails.BoardSize; i++)
+                for (int i = 0; i < gameState.BoardSize; i++)
                 {
-                    var row = GameDetails.Board.Skip(i * GameDetails.BoardSize).Take(GameDetails.BoardSize).ToList();
-                    var check = isWinner(row, i, Direction.Row);
-                    if (check.HasWinner)
+                    var row = gameState.Board.Skip(i * gameState.BoardSize).Take(gameState.BoardSize).ToList();
+                    var check = isWinner(gameState, row, i, Direction.Row);
+                    if (!check.HasWinner)
                     {
-                        GameDetails.GameOver = true;
-                        return check;
+                        var column = new List<char>();
+                        for (int c = i; c < gameState.BoardSize * gameState.BoardSize; c = c + gameState.BoardSize)
+                        {
+                            column.Add(gameState.Board[c]);
+                        }
+                        check = isWinner(gameState, column, i, Direction.Column);
                     }
 
-                    var column = new List<char>();
-                    for (int c = i; c < GameDetails.BoardSize*GameDetails.BoardSize; c = c + GameDetails.BoardSize)
-                    {
-                        column.Add(GameDetails.Board[c]);
-                    }
-                    check = isWinner(column, i, Direction.Column);
                     if (check.HasWinner)
                     {
-                        GameDetails.GameOver = true;
-                        return check;
+                        return returnGameWon(gameState, check);
                     }
-
-                    if (i == 0)
-                        diag.Add(GameDetails.Board[0]);
-                    else diag.Add(GameDetails.Board[(i * GameDetails.BoardSize) + i]);
+                    else
+                    {
+                        if (i == 0)
+                            diag.Add(gameState.Board[0]);
+                        else diag.Add(gameState.Board[(i * gameState.BoardSize) + i]);
+                    }
                 }
 
-                var diagCheck = isWinner(diag, 0, Direction.Diagonal);
+                var diagCheck = isWinner(gameState, diag, 0, Direction.Diagonal);
                 if (diagCheck.HasWinner)
                 {
-                    GameDetails.GameOver = true;
-                    return diagCheck;
+                    return returnGameWon(gameState, diagCheck);
                 }
             }
-            if (GameDetails.Turns == GameDetails.BoardSize * GameDetails.BoardSize)
+            if (gameState.Turns == gameState.BoardSize * gameState.BoardSize)
             {
-                GameDetails.GameOver = true;
+                gameState.GameOver = true;
             }
-            return new GameResult { HasWinner = false, Winner = null, WinningDirection = Direction.None, WinningIndex = null };
+            return gameState;
         }
 
-        private GameResult isWinner(List<char> lineToCheck, int index, Direction direction)
+        private IGameState returnGameWon(IGameState gameState, ITurnResult result)
         {
-            foreach (var item in GameDetails.AllowedChars)
+            if (result.HasWinner) gameState.GameOver = true;
+            else gameState.GameOver = false;
+            gameState.TurnResult = result;
+            return gameState;
+        }
+
+        private TurnResult isWinner(IGameState gameState, List<char> lineToCheck, int index, Direction direction)
+        {
+            foreach (var item in gameState.AllowedChars)
             {
                 var c = lineToCheck.Where(x => x == item);
-                if (c.Count() == GameDetails.BoardSize) return new GameResult() { HasWinner = true, Winner = item, WinningDirection = direction, WinningIndex = index };
+                if (c.Count() == gameState.BoardSize) return new TurnResult() { HasWinner = true, Winner = item, WinningDirection = direction, WinningIndex = index };
             }
-            return new GameResult() { HasWinner = false, Winner = new char?(), WinningDirection = Direction.None, WinningIndex = new int?() };
+            return new TurnResult() { HasWinner = false, Winner = new char?(), WinningDirection = Direction.None, WinningIndex = new int?() };
         }
     }
 }

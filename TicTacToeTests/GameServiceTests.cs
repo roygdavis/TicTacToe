@@ -1,54 +1,65 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Linq;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using TicTacToeLibrary.Enums;
+using TicTacToeLibrary.Models;
 using TicTacToeLibrary.Services;
-using TicTacToeLibrary.Repositories;
 
 namespace TicTacToeTests
 {
     [TestClass]
-    public class GameTests
+    public class GameServiceTests
     {
         [TestMethod]
         [DataRow(-100)]
         [DataRow(-1)]
         [DataRow(0)]
         [DataRow(2)]
-        public void Game_IfBoardSizeIsLessThan3_ShouldThrowException(int boardSize)
+        public void Play_IfBoardSizeIsLessThan3_ShouldThrowException(int boardSize)
         {
             // Arrange
             var moqRenderer = new Mock<IRenderer>();
-            moqRenderer.Setup(x => x.RenderStart()).Returns(new GameDetails(boardSize));
+            moqRenderer.Setup(x => x.RenderStart()).Returns(new GameState(boardSize));
+            var gameService = GameService.CreateInstance(moqRenderer.Object);
 
             //Act/Assert
-            Assert.ThrowsException<ArgumentException>(() => GameService.CreateInstance(moqRenderer.Object));
+            Assert.ThrowsException<ArgumentException>(() => gameService.Play());
         }
 
         [TestMethod]
         [DataRow(4)]
         [DataRow(6)]
         [DataRow(100)]
-        public void Game_IfBoardSizeNotOddNumber_ShouldThrowException(int boardSize)
+        public void Play_IfBoardSizeNotOddNumber_ShouldThrowException(int boardSize)
         {
             // Arrange
             var moqRenderer = new Mock<IRenderer>();
-            moqRenderer.Setup(x => x.RenderStart()).Returns(new GameDetails(boardSize));
+            moqRenderer.Setup(x => x.RenderStart()).Returns(new GameState(boardSize));
+            var gameService = GameService.CreateInstance(moqRenderer.Object);
 
             // Act/Assert
-            Assert.ThrowsException<ArgumentException>(() => GameService.CreateInstance(moqRenderer.Object));
+            Assert.ThrowsException<ArgumentException>(() => gameService.Play());
+        }
+
+        [TestMethod]
+        public void CreateInstance_WhenIRendererIsNull_ShouldThrowException()
+        {
+            // Arrange/Act/Assert
+            Assert.ThrowsException<ArgumentException>(() => GameService.CreateInstance(null));
         }
 
         [TestMethod]
         [DataRow(99)]
         [DataRow(3)]
         [DataRow(5)]
-        public void Game_IfBoardSizeIsValid_ShouldNotThrowException(int boardSize)
+        public void CreateInstance_IfRendererReturnsValidGameState_ShouldNotThrowException(int boardSize)
         {
             // Arrange/Act
             var moqRenderer = new Mock<IRenderer>();
-            moqRenderer.Setup(x => x.RenderStart()).Returns(new GameDetails());
+            moqRenderer.Setup(x => x.RenderStart()).Returns(new GameState());
 
             var o = GameService.CreateInstance(moqRenderer.Object);
 
@@ -99,45 +110,47 @@ namespace TicTacToeTests
                 ' ','O','O',
                 'X','O',' '
             }, 3, 0, Direction.Column, 'X')]
-        public void Game_PlayerTurn_WhenWinningTurn_HasWinner_ShouldBeTrue(char[] board, int nextMoveIndex, int expectedWinningIndex, Direction expectedDirection, char expectedWinningChar)
+        public void PlayerTurn_WhenWinningTurn_HasWinner_ShouldBeTrue(char[] board, int nextMoveIndex, int expectedWinningIndex, Direction expectedDirection, char expectedWinningChar)
         {
             // Arrange
-            var moqGameDetails = new GameDetails();
-            moqGameDetails.Board = board;
-            moqGameDetails.BoardSize = (int)Math.Sqrt((double)board.Length);
-            moqGameDetails.Turns = board.Count(x => x == 'X' || x == 'O');
-
+            var moqGameState = new GameState((int)Math.Sqrt((double)board.Length));
+            moqGameState.Board = board;
+            
             var moqRenderer = new Mock<IRenderer>();
-            moqRenderer.Setup(x => x.RenderStart()).Returns(moqGameDetails);
+            moqRenderer.Setup(x => x.RenderStart()).Returns(moqGameState);
 
             var sut = GameService.CreateInstance(moqRenderer.Object);
 
             // Act
-            var result = sut.PlayerTurn(nextMoveIndex, expectedWinningChar);
+            var result = sut.PlayerTurn(moqGameState, nextMoveIndex, expectedWinningChar);
 
             // Assert
 
-            Assert.IsTrue(result.HasWinner);
-            Assert.IsTrue(result.Winner.HasValue);
-            Assert.IsTrue(result.WinningIndex == expectedWinningIndex);
-            Assert.IsTrue(result.WinningDirection == expectedDirection);
-            Assert.AreEqual(expectedWinningChar, result.Winner.Value);
+            Assert.IsTrue(result.TurnResult.HasWinner);
+            Assert.IsTrue(result.TurnResult.Winner.HasValue);
+            Assert.IsTrue(result.TurnResult.WinningIndex == expectedWinningIndex);
+            Assert.IsTrue(result.TurnResult.WinningDirection == expectedDirection);
+            Assert.AreEqual(expectedWinningChar, result.TurnResult.Winner.Value);
         }
 
         [TestMethod]
         [DataRow(9)]
         [DataRow(19)]
         [DataRow(99)]
-        public void Game_WhenGameDetailsTurnsIsGreaterThanBoardSize_ShouldThrowException(int boardSize)
+        public void PlayerTurn_WhenGameDetailsTurnsIsGreaterThanBoardSize_ShouldThrowException(int boardSize)
         {
             // Arrange
-            var moqGameDetails = new Mock<IGameDetails>();
-            moqGameDetails.Setup(x => x.BoardSize).Returns(boardSize);
-            moqGameDetails.Setup(x => x.Turns).Returns(boardSize * boardSize);
-            var sut = new GameService() { GameDetails = moqGameDetails.Object };
+            var moqGameState = new Mock<IGameState>();
+            moqGameState.Setup(x => x.BoardSize).Returns(boardSize);
+            moqGameState.Setup(x => x.Turns).Returns(boardSize * boardSize);
+
+            var moqRenderer = new Mock<IRenderer>();
+            moqRenderer.Setup(x => x.RenderStart()).Returns(moqGameState.Object);
+
+            var sut = GameService.CreateInstance(moqRenderer.Object);
 
             // Act/Assert
-            Assert.ThrowsException<ArgumentException>(() => sut.PlayerTurn(1, 'X'));
+            Assert.ThrowsException<ArgumentException>(() => sut.PlayerTurn(moqGameState.Object, 1, 'X'));
         }
 
         [TestMethod]
@@ -195,15 +208,16 @@ namespace TicTacToeTests
                 ' ','O','O',
                 'X','O','X'
             }, 8)]
-        public void Game_WhenPlayerMovesToPlaceAlreadyTaken_ShouldThrowException(char[] board, int nextMoveIndex)
+        public void PlayerTurn_WhenPlayerMovesToPlaceAlreadyTaken_ShouldThrowException(char[] board, int nextMoveIndex)
         {
             // Arrange
             var playerChar = 'X';
-            var moqGameDetails = new Mock<IGameDetails>();
-            moqGameDetails.Setup(x=>x.Board).Returns(board);
+            var moqGameDetails = new Mock<IGameState>();
+            moqGameDetails.Setup(x => x.Board).Returns(board);
             moqGameDetails.Setup(x => x.BoardSize).Returns((int)Math.Sqrt((double)board.Length));
             moqGameDetails.Setup(x => x.Turns).Returns(board.Count(x => x == 'X' || x == 'O'));
             moqGameDetails.Setup(x => x.CurrentPlayer).Returns(playerChar);
+            moqGameDetails.Setup(x => x.AllowedChars).Returns(new char[] { 'X', 'O' });
 
             var moqRenderer = new Mock<IRenderer>();
             moqRenderer.Setup(x => x.RenderStart()).Returns(moqGameDetails.Object);
@@ -211,7 +225,35 @@ namespace TicTacToeTests
             var sut = GameService.CreateInstance(moqRenderer.Object);
 
             // Act/Assert
-            Assert.ThrowsException<ArgumentException>(() => sut.PlayerTurn(nextMoveIndex, playerChar));
+            Assert.ThrowsException<ArgumentException>(() => sut.PlayerTurn(moqGameDetails.Object, nextMoveIndex, playerChar));
+        }
+
+        [TestMethod]
+        [DataRow(new char[]
+            {
+                'X', 'X', 'O',
+                'X','O','O',
+                'X','O','X'
+            }, 8)]
+        public void PlayerTurn_WhenBoardIsComplete_ShouldThrowException(char[] board, int nextMoveIndex)
+        {
+            // Arrange
+            var playerChar = 'X';
+            var moqGameState = new Mock<IGameState>();
+            moqGameState.Setup(x => x.Board).Returns(board);
+            moqGameState.Setup(x => x.BoardSize).Returns((int)Math.Sqrt((double)board.Length));
+            moqGameState.Setup(x => x.Turns).Returns(board.Count(x => x == 'X' || x == 'O'));
+            moqGameState.Setup(x => x.CurrentPlayer).Returns(playerChar);
+            moqGameState.Setup(x => x.AllowedChars).Returns(new char[] { 'X', 'O' });
+
+            var moqRenderer = new Mock<IRenderer>();
+            moqRenderer.Setup(x => x.RenderStart()).Returns(moqGameState.Object);
+
+            var sut = GameService.CreateInstance(moqRenderer.Object);
+
+            // Act/Assert
+            Assert.ThrowsException<NotSupportedException>(() => sut.PlayerTurn(moqGameState.Object, 0, playerChar));
+
         }
     }
 }

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using TicTacToeLibrary.Enums;
 
-namespace TicTacToeLibrary.Repositories
+namespace TicTacToeLibrary.Models
 {
-    public class GameResult : IGameResult
+    public class TurnResult : ITurnResult
     {
         public Nullable<int> WinningIndex { get; set; }
         public Direction WinningDirection { get; set; }

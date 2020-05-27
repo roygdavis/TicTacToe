@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TicTacToeLibrary.Repositories
+namespace TicTacToeLibrary.Models
 {
     public class PlayerTurn
     {

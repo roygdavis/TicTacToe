@@ -1,8 +1,8 @@
 ﻿using TicTacToeLibrary.Enums;
 
-namespace TicTacToeLibrary.Repositories
+namespace TicTacToeLibrary.Models
 {
-    public interface IGameResult
+    public interface ITurnResult
     {
         bool HasWinner { get; set; }
         char? Winner { get; set; }

@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TicTacToeLibrary.Repositories;
+using TicTacToeLibrary.Models;
 
 namespace TicTacToeLibrary.Services
 {
     public interface IRenderer
     {
-        void Render(IGameDetails gameDetails);
-        void RenderWin(IGameResult gameResult);
-        IGameDetails RenderStart();
-        PlayerTurn RenderTurn(IGameDetails gameDetails);
+        void Render(IGameState gameDetails);
+        void RenderWin(ITurnResult gameResult);
+        IGameState RenderStart();
+        PlayerTurn RenderTurn(IGameState gameDetails);
         bool RenderEnd();
         void RenderDraw();
     }

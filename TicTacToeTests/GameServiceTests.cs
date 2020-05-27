@@ -31,7 +31,7 @@ namespace TicTacToeTests
         [DataRow(4)]
         [DataRow(6)]
         [DataRow(100)]
-        public void CreateState_IfBoardSizeNotOddNumber_ShouldThrowException(int boardSize)
+        public void CreateState_IfBoardSizeAnEvenNumber_ShouldThrowException(int boardSize)
         {
             // Arrange
             var sut = new GameService();
@@ -41,14 +41,43 @@ namespace TicTacToeTests
         }
 
         [TestMethod]
+        [DataRow(new char[] { 'X', 'X' })]
+        [DataRow(new char[] { 'X' })]
+        [DataRow(new char[] { 'X', 'Y','Z' })]
+        [DataRow(new char[] {  })]
+        public void CreateState_IfPlayerCharsAreNotTwoDistinctValues_ShouldThrowException(char[] playerChars)
+        {
+            // Arrange
+            var sut = new GameService();
+
+            // Act/Assert
+            Assert.ThrowsException<ArgumentException>(() => sut.CreateState(3, playerChars));
+        }
+
+        [TestMethod]
         [DataRow(99)]
         [DataRow(3)]
         [DataRow(5)]
-        public void CreateInstance_IfRendererReturnsValidGameState_ShouldNotThrowException(int boardSize)
+        public void CreateState_IfValidBoardSize_ShouldNotThrowException(int boardSize)
         {
             // Arrange/Act
             var sut = new GameService();
             var gs = sut.CreateState(boardSize);
+
+            //Assert
+            Assert.IsTrue(sut is GameService);
+            Assert.IsTrue(gs is GameState);
+        }
+
+        [TestMethod]
+        [DataRow(new char[] { 'X', 'Y' })]
+        [DataRow(new char[] { '1', '2' })]
+        [DataRow(new char[] { '[', ']' })]
+        public void CreateState_IfValidPlayerChars_ShouldNotThrowException(char[] playerChars)
+        {
+            // Arrange/Act
+            var sut = new GameService();
+            var gs = sut.CreateState(3, playerChars);
 
             //Assert
             Assert.IsTrue(sut is GameService);
@@ -64,10 +93,10 @@ namespace TicTacToeTests
             }, 2, 0, Direction.Row, 'X')]
         [DataRow(new char[]
             {
-                'X', 'X', ' ',
-                'O','O',' ',
+                'O', 'O', ' ',
+                'X','X',' ',
                 ' ',' ',' '
-            }, 5, 1, Direction.Row, 'O')]
+            }, 5, 1, Direction.Row, 'X')]
         [DataRow(new char[]
             {
                 'X', 'X', ' ',
@@ -84,25 +113,34 @@ namespace TicTacToeTests
             {
                 'X', 'X', 'O',
                 'O','X','O',
-                'X','O',' '
+                'X',' ',' '
             }, 8, 2, Direction.Column, 'O')]
         [DataRow(new char[]
             {
                 'X', 'X', 'O',
-                'O','X','O',
-                'X',' ','X'
+                'O', 'X', 'O',
+                'O', ' ', 'X'
             }, 7, 1, Direction.Column, 'X')]
         [DataRow(new char[]
             {
                 'X', 'X', 'O',
-                ' ','O','O',
+                ' ',' ','O',
                 'X','O',' '
             }, 3, 0, Direction.Column, 'X')]
+        [DataRow(new char[]
+            {
+                'X', 'O', 'X',
+                'O', 'X', 'O',
+                ' ', 'X', 'O'
+            }, 6, 0, Direction.Diagonal, 'X')]
         public void PlayerTurn_WhenWinningTurn_HasWinner_ShouldBeTrue(char[] board, int nextMoveIndex, int expectedWinningIndex, Direction expectedDirection, char expectedWinningChar)
         {
             // Arrange
-            var moqGameState = new GameState((int)Math.Sqrt((double)board.Length));
-            moqGameState.Board = board;
+            var moqGameState = new GameState()
+            {
+                AllowedChars = new char[] { 'X', 'O' },
+                Board = board
+            };
             
             var sut = new GameService();
 
@@ -110,7 +148,6 @@ namespace TicTacToeTests
             var result = sut.PlayerTurn(moqGameState, nextMoveIndex);
 
             // Assert
-
             Assert.IsTrue(result.TurnResult.HasWinner);
             Assert.IsTrue(result.TurnResult.Winner.HasValue);
             Assert.IsTrue(result.TurnResult.WinningIndex == expectedWinningIndex);
@@ -132,10 +169,10 @@ namespace TicTacToeTests
             var moqRenderer = new Mock<IRenderer>();
             moqRenderer.Setup(x => x.RenderStart()).Returns(moqGameState.Object);
 
-            var sut = GameService.CreateInstance(moqRenderer.Object);
+            var sut = new GameService();
 
             // Act/Assert
-            Assert.ThrowsException<ArgumentException>(() => sut.PlayerTurn(moqGameState.Object, 1, 'X'));
+            Assert.ThrowsException<NotSupportedException>(() => sut.PlayerTurn(moqGameState.Object, 1));
         }
 
         [TestMethod]
@@ -207,10 +244,10 @@ namespace TicTacToeTests
             var moqRenderer = new Mock<IRenderer>();
             moqRenderer.Setup(x => x.RenderStart()).Returns(moqGameDetails.Object);
 
-            var sut = GameService.CreateInstance(moqRenderer.Object);
+            var sut = new GameService();
 
             // Act/Assert
-            Assert.ThrowsException<ArgumentException>(() => sut.PlayerTurn(moqGameDetails.Object, nextMoveIndex, playerChar));
+            Assert.ThrowsException<ArgumentException>(() => sut.PlayerTurn(moqGameDetails.Object, nextMoveIndex));
         }
 
         [TestMethod]
@@ -220,7 +257,7 @@ namespace TicTacToeTests
                 'X','O','O',
                 'X','O','X'
             }, 8)]
-        public void PlayerTurn_WhenBoardIsComplete_ShouldThrowException(char[] board, int nextMoveIndex)
+        public void PlayerTurn_WhenBoardIsComplete_AndPlayerTurnCalled_ShouldThrowException(char[] board, int nextMoveIndex)
         {
             // Arrange
             var playerChar = 'X';
@@ -234,10 +271,45 @@ namespace TicTacToeTests
             var moqRenderer = new Mock<IRenderer>();
             moqRenderer.Setup(x => x.RenderStart()).Returns(moqGameState.Object);
 
-            var sut = GameService.CreateInstance(moqRenderer.Object);
+            var sut = new GameService();
 
             // Act/Assert
-            Assert.ThrowsException<NotSupportedException>(() => sut.PlayerTurn(moqGameState.Object, 0, playerChar));
+            Assert.ThrowsException<NotSupportedException>(() => sut.PlayerTurn(moqGameState.Object, 0));
+        }
+
+        [TestMethod]
+        [DataRow(new char[]
+            {
+                'X','O','X',
+                'O','X','O',
+                'O',' ','O'
+            }, new char[] { 'X', 'O' }, 7, false)]
+        public void PlayerTurn_WhenLastPlayerTurnIsCalled_AndThereIsNoWinner_ShouldReturnHasWinnerFalse(char[] board, char[] allowedChars, int nextMoveIndex, bool expectedResult)
+        {
+            // Arrange
+            var playerChar = allowedChars.First();
+            var moqGameState = new GameState();
+            moqGameState.Board = board;
+            moqGameState.AllowedChars = allowedChars;
+            //moqGameState.BoardSize=).Returns((int)Math.Sqrt((double)board.Length));
+            //moqGameState.Setup(x => x.Turns).Returns(board.Count(x => x == 'X' || x == 'O') + 1);
+            //moqGameState.Setup(x => x.CurrentPlayer).Returns(playerChar);
+            //moqGameState.Setup(x => x.AllowedChars).Returns(allowedChars);
+
+            //var moqTurnResult = new Mock<ITurnResult>();
+
+            //moqGameState.Setup(x => x.TurnResult).Returns(moqTurnResult.Object);
+
+            var moqRenderer = new Mock<IRenderer>();
+            moqRenderer.Setup(x => x.RenderStart()).Returns(moqGameState);
+
+            var sut = new GameService();
+
+            // Act
+            var result = sut.PlayerTurn(moqGameState, nextMoveIndex);
+
+            //Assert
+            Assert.AreEqual(expectedResult, result.TurnResult.HasWinner);
 
         }
     }

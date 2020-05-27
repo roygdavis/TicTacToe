@@ -17,14 +17,13 @@ namespace TicTacToeLibrary.Services
             }
             if (playerChars == null) playerChars = new char[] { 'X', 'O' };
             if (playerChars.Length < 2 || playerChars.Length > 2) throw new ArgumentException("playerChars can only be a length of 2");
-            if (playerChars.Distinct().Count() == 1) throw new NotSupportedException("Each playerChar must be a unique character");
-            return new GameState(boardSize, playerChars);
+            if (playerChars.Distinct().Count() == 1) throw new ArgumentException("Each playerChar must be a unique character");
+            return new GameState() { AllowedChars = playerChars, Board = new char[boardSize * boardSize] };
         }
                 
         public IGameState PlayerTurn(IGameState gameState, int index)
         {
             if (index > (gameState.BoardSize * gameState.BoardSize) - 1) throw new ArgumentException($"index {index} is bigger than the board size of {gameState.BoardSize}");
-            //if (!gameState.AllowedChars.Contains(playerChar)) throw new ArgumentException($"playerChar of {playerChar} is not one of {new string(gameState.AllowedChars).Split(",")}");
             if (gameState.Board.Count(x => gameState.AllowedChars.Contains(x)) >= gameState.Board.Length) throw new NotSupportedException("Game is over, there are no spaces left on the board.  Start a new game.");
             if (gameState.AllowedChars.Contains(gameState.Board[index])) throw new ArgumentException("That space has already been taken");
 
@@ -33,7 +32,8 @@ namespace TicTacToeLibrary.Services
             // now test if player won
             if (gameState.Turns > 4)
             {
-                var diag = new List<char>();
+                var topleftDiag = new List<char>();
+                var toprightDiag = new List<char>();
                 for (int i = 0; i < gameState.BoardSize; i++)
                 {
                     var row = gameState.Board.Skip(i * gameState.BoardSize).Take(gameState.BoardSize).ToList();
@@ -55,20 +55,34 @@ namespace TicTacToeLibrary.Services
                     else
                     {
                         if (i == 0)
-                            diag.Add(gameState.Board[0]);
-                        else diag.Add(gameState.Board[(i * gameState.BoardSize) + i]);
+                        {
+                            topleftDiag.Add(gameState.Board[0]);
+                            toprightDiag.Add(gameState.Board[gameState.BoardSize - 1]);
+                        }
+                        else
+                        {
+                            topleftDiag.Add(gameState.Board[(i * gameState.BoardSize) + i]);
+                            toprightDiag.Add(gameState.Board[(i*gameState.BoardSize)- i]);
+                        }
                     }
                 }
 
-                var diagCheck = isWinner(gameState, diag, 0, Direction.Diagonal);
-                if (diagCheck.HasWinner)
+                var diagtoprightCheck = isWinner(gameState, topleftDiag, 0, Direction.Diagonal);
+                if (diagtoprightCheck.HasWinner)
                 {
-                    return returnGameWon(gameState, diagCheck);
+                    return returnGameWon(gameState, diagtoprightCheck);
+                }
+
+                var diagtopleftCheck = isWinner(gameState, toprightDiag, 0, Direction.Diagonal);
+                if (diagtopleftCheck.HasWinner)
+                {
+                    return returnGameWon(gameState, diagtopleftCheck);
                 }
             }
             if (gameState.Turns == gameState.BoardSize * gameState.BoardSize)
             {
                 gameState.GameOver = true;
+                gameState.TurnResult = new TurnResult { HasWinner = false, WinningDirection = Direction.None };
             }
             return gameState;
         }

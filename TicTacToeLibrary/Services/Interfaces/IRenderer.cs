@@ -7,11 +7,9 @@ namespace TicTacToeLibrary.Services
 {
     public interface IRenderer
     {
-        void Render(IGameState gameDetails);
-        void RenderWin(ITurnResult gameResult);
+        void RenderBoard(IGameState gameState);
+        bool RenderEnd(IGameState gameState);
         IGameState RenderStart();
-        PlayerTurn RenderTurn(IGameState gameDetails);
-        bool RenderEnd();
-        void RenderDraw();
+        IGameState RenderTurn(IGameState gameState);
     }
 }

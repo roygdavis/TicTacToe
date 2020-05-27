@@ -14,7 +14,8 @@ namespace TicTacToe
             while (!gameState.GameOver)
             {
                 gameState = consoleRenderer.RenderTurn(gameState);
-            }            
+            }
+            consoleRenderer.RenderEnd(gameState);
         }
     }
 }

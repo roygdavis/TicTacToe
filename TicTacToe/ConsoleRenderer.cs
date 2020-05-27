@@ -7,7 +7,7 @@ using TicTacToeLibrary.Services;
 
 namespace TicTacToe
 {
-    public class ConsoleRenderer : IConsoleRenderer
+    public class ConsoleRenderer : IRenderer
     {
         private readonly IGameService gameService;
 
@@ -18,8 +18,7 @@ namespace TicTacToe
 
         public void RenderBoard(IGameState gameState)
         {
-
-            Console.WriteLine();
+            Console.Clear();
             for (int i = 0; i < gameState.Board.Length; i++)
             {
                 var ch = gameState.Board[i];
@@ -64,6 +63,7 @@ namespace TicTacToe
                     {
                         Console.WriteLine();
                         var g = gameService.CreateState(boardSize, null);
+                        RenderBoard(g);
                         return g;
                     }
                     catch (Exception ex)
@@ -85,7 +85,6 @@ namespace TicTacToe
             bool indexParsed = false;
             while (!indexParsed)
             {
-                RenderBoard(gameState);
                 Console.WriteLine($"It's {gameState.CurrentPlayer} turn, enter your index (0-{gameState.Board.Length - 1}): ");
                 var indexChars = Console.ReadLine();
                 int index;
@@ -95,6 +94,7 @@ namespace TicTacToe
                     try
                     {
                         gameState = gameService.PlayerTurn(gameState, index);
+                        RenderBoard(gameState);
                         return gameState;
                     }
                     catch (Exception ex)

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TicTacToe.Classes
+namespace TicTacToeLibrary.Repositories
 {
     public class GameDetails : IGameDetails
     {

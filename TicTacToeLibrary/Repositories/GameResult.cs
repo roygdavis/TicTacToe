@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TicTacToeLibrary.Enums;
 
-namespace TicTacToe.Classes
+namespace TicTacToeLibrary.Repositories
 {
     public class GameResult : IGameResult
     {

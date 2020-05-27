@@ -97,3 +97,5 @@ C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\bin\Debug\netcoreapp3.1
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\bin\Debug\netcoreapp3.1\Castle.Core.dll
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\bin\Debug\netcoreapp3.1\Moq.dll
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\obj\Debug\netcoreapp3.1\TicTacToeTests.csproj.CoreCompileInputs.cache
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\bin\Debug\netcoreapp3.1\TicTacToeLibrary.dll
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeTests\bin\Debug\netcoreapp3.1\TicTacToeLibrary.pdb

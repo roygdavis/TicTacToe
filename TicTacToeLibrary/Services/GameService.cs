@@ -2,35 +2,37 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TicTacToeLibrary.Enums;
+using TicTacToeLibrary.Repositories;
 
-namespace TicTacToe.Classes
+namespace TicTacToeLibrary.Services
 {
-    public class Game
+    public class GameService
     {
         public IGameDetails GameDetails { get; set; }
 
         public IRenderer Renderer { get; set; }
 
-        public Game()
+        public GameService()
         {
             GameDetails = new GameDetails();
         }
 
-        Game(IGameDetails gameDetails, IRenderer renderer)
+        GameService(IGameDetails gameDetails, IRenderer renderer)
         {
             GameDetails = gameDetails;
             Renderer = renderer;
             Renderer?.Render(gameDetails);
         }
 
-        public static Game CreateInstance(IRenderer renderer)
+        public static GameService CreateInstance(IRenderer renderer)
         {
             var gameDetails = renderer.RenderStart();
             if (gameDetails.BoardSize < 3 || gameDetails.BoardSize % 2 == 0)
             {
                 throw new ArgumentException("boardSize must be 3 or more and an odd number");
             }
-            return new Game(gameDetails, renderer);
+            return new GameService(gameDetails, renderer);
         }
 
         public void Play()

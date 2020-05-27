@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TicTacToeLibrary.Repositories;
+using TicTacToeLibrary.Services;
 
-namespace TicTacToe.Classes
+namespace TicTacToe
 {
     public class ConsoleRenderer : IRenderer
     {

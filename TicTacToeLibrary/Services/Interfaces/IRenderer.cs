@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TicTacToeLibrary.Repositories;
 
-namespace TicTacToe.Classes
+namespace TicTacToeLibrary.Services
 {
     public interface IRenderer
     {

@@ -1,4 +1,4 @@
-﻿namespace TicTacToe.Classes
+﻿namespace TicTacToeLibrary.Repositories
 {
     public interface IGameDetails
     {

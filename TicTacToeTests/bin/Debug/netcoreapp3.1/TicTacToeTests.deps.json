@@ -1164,8 +1164,16 @@
         }
       },
       "TicTacToe/1.0.0": {
+        "dependencies": {
+          "TicTacToeLibrary": "1.0.0"
+        },
         "runtime": {
           "TicTacToe.dll": {}
+        }
+      },
+      "TicTacToeLibrary/1.0.0": {
+        "runtime": {
+          "TicTacToeLibrary.dll": {}
         }
       }
     }
@@ -1842,6 +1850,11 @@
       "hashPath": "system.xml.xmldocument.4.3.0.nupkg.sha512"
     },
     "TicTacToe/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "TicTacToeLibrary/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

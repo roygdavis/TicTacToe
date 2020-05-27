@@ -1,4 +1,6 @@
-﻿namespace TicTacToe.Classes
+﻿using TicTacToeLibrary.Enums;
+
+namespace TicTacToeLibrary.Repositories
 {
     public interface IGameResult
     {

@@ -1,0 +1,8 @@
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeLibrary\obj\Debug\netcoreapp3.1\TicTacToeLibrary.csproj.CoreCompileInputs.cache
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeLibrary\obj\Debug\netcoreapp3.1\TicTacToeLibrary.AssemblyInfoInputs.cache
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeLibrary\obj\Debug\netcoreapp3.1\TicTacToeLibrary.AssemblyInfo.cs
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeLibrary\bin\Debug\netcoreapp3.1\TicTacToeLibrary.deps.json
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeLibrary\bin\Debug\netcoreapp3.1\TicTacToeLibrary.dll
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeLibrary\bin\Debug\netcoreapp3.1\TicTacToeLibrary.pdb
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeLibrary\obj\Debug\netcoreapp3.1\TicTacToeLibrary.dll
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeLibrary\obj\Debug\netcoreapp3.1\TicTacToeLibrary.pdb

@@ -8,7 +8,8 @@ namespace TicTacToeLibrary.Enums
     {
         Row,
         Column,
-        Diagonal,
+        TopLeftDiagonal,
+        TopRightDiagonal,
         None
     }
 }

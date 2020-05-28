@@ -6,3 +6,4 @@ C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeLibrary\bin\Debug\netcoreapp3
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeLibrary\bin\Debug\netcoreapp3.1\TicTacToeLibrary.pdb
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeLibrary\obj\Debug\netcoreapp3.1\TicTacToeLibrary.dll
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeLibrary\obj\Debug\netcoreapp3.1\TicTacToeLibrary.pdb
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToeLibrary\obj\Debug\netcoreapp3.1\TicTacToeLibrary.csprojAssemblyReference.cache

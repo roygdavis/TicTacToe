@@ -9,7 +9,7 @@ namespace TicTacToeLibrary.Services
 {
     public class GameService : IGameService
     {
-        public IGameState CreateState(int boardSize = 3, char[] playerChars =  null)
+        public IGameState CreateState(int boardSize = 3, char[] playerChars = null)
         {
             if (boardSize < 3 || boardSize % 2 == 0)
             {
@@ -20,7 +20,7 @@ namespace TicTacToeLibrary.Services
             if (playerChars.Distinct().Count() == 1) throw new ArgumentException("Each playerChar must be a unique character");
             return new GameState() { AllowedChars = playerChars, Board = new char[boardSize * boardSize] };
         }
-                
+
         public IGameState PlayerTurn(IGameState gameState, int index)
         {
             if (index > (gameState.BoardSize * gameState.BoardSize) - 1) throw new ArgumentException($"index {index} is bigger than the board size of {gameState.BoardSize}");
@@ -28,7 +28,7 @@ namespace TicTacToeLibrary.Services
             if (gameState.AllowedChars.Contains(gameState.Board[index])) throw new ArgumentException("That space has already been taken");
 
             gameState.Board[index] = gameState.CurrentPlayer;
-            
+
             // now test if player won
             if (gameState.Turns > 4)
             {
@@ -62,21 +62,21 @@ namespace TicTacToeLibrary.Services
                         else
                         {
                             topleftDiag.Add(gameState.Board[(i * gameState.BoardSize) + i]);
-                            toprightDiag.Add(gameState.Board[(i*gameState.BoardSize)- i]);
+                            toprightDiag.Add(gameState.Board[((gameState.BoardSize * i) + (gameState.BoardSize - i) - 1)]);
                         }
                     }
                 }
 
-                var diagtoprightCheck = isWinner(gameState, topleftDiag, 0, Direction.Diagonal);
-                if (diagtoprightCheck.HasWinner)
-                {
-                    return returnGameWon(gameState, diagtoprightCheck);
-                }
-
-                var diagtopleftCheck = isWinner(gameState, toprightDiag, 0, Direction.Diagonal);
+                var diagtopleftCheck = isWinner(gameState, topleftDiag, 0, Direction.TopLeftDiagonal);
                 if (diagtopleftCheck.HasWinner)
                 {
                     return returnGameWon(gameState, diagtopleftCheck);
+                }
+
+                var diagtoprightCheck = isWinner(gameState, toprightDiag, 0, Direction.TopRightDiagonal);
+                if (diagtoprightCheck.HasWinner)
+                {
+                    return returnGameWon(gameState, diagtoprightCheck);
                 }
             }
             if (gameState.Turns == gameState.BoardSize * gameState.BoardSize)

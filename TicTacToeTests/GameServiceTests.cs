@@ -108,7 +108,7 @@ namespace TicTacToeTests
                 'X', 'X', 'O',
                 'O','X','O',
                 'X','O',' '
-            }, 8, 0, Direction.Diagonal, 'X')]
+            }, 8, 0, Direction.TopLeftDiagonal, 'X')]
         [DataRow(new char[]
             {
                 'X', 'X', 'O',
@@ -132,7 +132,7 @@ namespace TicTacToeTests
                 'X', 'O', 'X',
                 'O', 'X', 'O',
                 ' ', 'X', 'O'
-            }, 6, 0, Direction.Diagonal, 'X')]
+            }, 6, 0, Direction.TopRightDiagonal, 'X')]
         public void PlayerTurn_WhenWinningTurn_HasWinner_ShouldBeTrue(char[] board, int nextMoveIndex, int expectedWinningIndex, Direction expectedDirection, char expectedWinningChar)
         {
             // Arrange

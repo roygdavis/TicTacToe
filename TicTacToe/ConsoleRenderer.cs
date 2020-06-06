@@ -109,7 +109,11 @@ namespace TicTacToe
 
         private void renderWin(IGameState gameState)
         {
-            Console.WriteLine($"Congratulations {gameState.TurnResult.Winner}, you've won at index {gameState.TurnResult.WinningIndex} in a {gameState.TurnResult.WinningDirection} direction!");
+            Console.WriteLine($"Congratulations {gameState.TurnResult.Winner});");
+            foreach (var item in gameState.TurnResult.WinningDetails)
+            {
+                Console.WriteLine($"\tyou've won at index {item.WinningIndex} in a {item.WinningDirection} direction!");
+            }
         }
     }
 }

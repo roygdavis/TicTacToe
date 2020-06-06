@@ -118,8 +118,8 @@ namespace TicTacToeTests
         [DataRow(new char[]
             {
                 'X', 'X', 'O',
-                'O', 'X', 'O',
-                'O', ' ', 'X'
+                'O', 'X', 'X',
+                'O', ' ', 'O'
             }, 7, 1, Direction.Column, 'X')]
         [DataRow(new char[]
             {
@@ -150,8 +150,9 @@ namespace TicTacToeTests
             // Assert
             Assert.IsTrue(result.TurnResult.HasWinner);
             Assert.IsTrue(result.TurnResult.Winner.HasValue);
-            Assert.IsTrue(result.TurnResult.WinningIndex == expectedWinningIndex);
-            Assert.IsTrue(result.TurnResult.WinningDirection == expectedDirection);
+            Assert.IsTrue(result.TurnResult.WinningDetails.Count == 1);
+            Assert.IsTrue(result.TurnResult.WinningDetails.First().WinningIndex == expectedWinningIndex);
+            Assert.IsTrue(result.TurnResult.WinningDetails.First().WinningDirection == expectedDirection);
             Assert.AreEqual(expectedWinningChar, result.TurnResult.Winner.Value);
         }
 

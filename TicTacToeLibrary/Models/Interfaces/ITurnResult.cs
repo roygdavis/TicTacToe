@@ -1,12 +1,12 @@
-﻿using TicTacToeLibrary.Enums;
+﻿using System.Collections.Generic;
+using TicTacToeLibrary.Enums;
 
 namespace TicTacToeLibrary.Models
 {
     public interface ITurnResult
     {
-        bool HasWinner { get; set; }
+        bool HasWinner { get; }
         char? Winner { get; set; }
-        Direction WinningDirection { get; set; }
-        int? WinningIndex { get; set; }
+        IList<IWinningDetails> WinningDetails { get; set; }
     }
 }

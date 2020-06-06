@@ -26,6 +26,12 @@ namespace TicTacToeLibrary.Services
                 GameOver = initialGameState.GameOver
             };
 
+            // are there any spots on the board which are winners?
+
+            // go through each item and return how many turns away from a win
+
+            // the space with the smallest turns count is the spot to go for
+
             for (int i = 0; i < gameState.Board.Length; i++)
             {
                 if (!gameState.AllowedChars.Contains(gameState.Board[i]))

@@ -4,7 +4,6 @@ C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\bin\Debug\netcoreapp3.1\TicT
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\bin\Debug\netcoreapp3.1\TicTacToe.runtimeconfig.dev.json
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\bin\Debug\netcoreapp3.1\TicTacToe.dll
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\bin\Debug\netcoreapp3.1\TicTacToe.pdb
-C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\obj\Debug\netcoreapp3.1\TicTacToe.csproj.CoreCompileInputs.cache
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\obj\Debug\netcoreapp3.1\TicTacToe.AssemblyInfoInputs.cache
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\obj\Debug\netcoreapp3.1\TicTacToe.AssemblyInfo.cs
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\obj\Debug\netcoreapp3.1\TicTacToe.dll
@@ -14,3 +13,8 @@ C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\obj\Debug\netcoreapp3.1\TicT
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\bin\Debug\netcoreapp3.1\TicTacToeLibrary.dll
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\bin\Debug\netcoreapp3.1\TicTacToeLibrary.pdb
 C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\obj\Debug\netcoreapp3.1\TicTacToe.csproj.CopyComplete
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Configuration.Abstractions.dll
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\bin\Debug\netcoreapp3.1\Microsoft.Extensions.Primitives.dll
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\bin\Debug\netcoreapp3.1\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\bin\Debug\netcoreapp3.1\Microsoft.Extensions.DependencyInjection.dll
+C:\Users\roy.davis\source\repos\TicTacToe\TicTacToe\obj\Debug\netcoreapp3.1\TicTacToe.csproj.CoreCompileInputs.cache

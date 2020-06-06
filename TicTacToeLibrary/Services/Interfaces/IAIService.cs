@@ -5,7 +5,7 @@ using TicTacToeLibrary.Models;
 
 namespace TicTacToeLibrary.Services
 {
-    public interface INextMoveCalculator
+    public interface IAIService
     {
         int DetermineNextBestMoveIndex(IGameState gameState);
     }

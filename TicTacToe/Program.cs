@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using TicTacToeLibrary.Models;
 using TicTacToeLibrary.Services;
 
@@ -8,8 +9,13 @@ namespace TicTacToe
     {
         static void Main(string[] args)
         {
-            var gameService = new GameService();
-            var consoleRenderer = new ConsoleRenderer(gameService);
+            var serviceProvider = new ServiceCollection()
+                .AddSingleton<IGameService, GameService>()
+                .AddSingleton<IRenderer, ConsoleRenderer>()
+                .BuildServiceProvider();
+
+            var consoleRenderer = serviceProvider.GetService<IRenderer>();
+
             var gameState = consoleRenderer.RenderStart();
             while (!gameState.GameOver)
             {

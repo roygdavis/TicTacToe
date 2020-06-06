@@ -6,8 +6,12 @@ using TicTacToeLibrary.Models;
 
 namespace TicTacToeLibrary.Services
 {
-    public class NextMoveCalculator : INextMoveCalculator
+    public class AIService : IAIService
     {
+        private readonly IGameService _gameService;
+
+        public AIService(IGameService gameService) => _gameService = gameService;
+
         public int DetermineNextBestMoveIndex(IGameState gameState)
         {
             return DetermineNextBestMove(gameState, 0, gameState.CurrentPlayer);

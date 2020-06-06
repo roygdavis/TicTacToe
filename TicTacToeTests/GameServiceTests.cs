@@ -132,7 +132,7 @@ namespace TicTacToeTests
                 'X', 'O', 'X',
                 'O', 'X', 'O',
                 ' ', 'X', 'O'
-            }, 6, 0, Direction.TopRightDiagonal, 'X')]
+            }, 6, 2, Direction.TopRightDiagonal, 'X')]
         public void PlayerTurn_WhenWinningTurn_HasWinner_ShouldBeTrue(char[] board, int nextMoveIndex, int expectedWinningIndex, Direction expectedDirection, char expectedWinningChar)
         {
             // Arrange

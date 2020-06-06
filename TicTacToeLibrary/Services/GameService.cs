@@ -29,56 +29,9 @@ namespace TicTacToeLibrary.Services
 
             gameState.Board[index] = gameState.CurrentPlayer;
 
-            // now test if player won
-            if (gameState.Turns > 4)
-            {
-                var topleftDiag = new List<char>();
-                var toprightDiag = new List<char>();
-                for (int i = 0; i < gameState.BoardSize; i++)
-                {
-                    var row = gameState.Board.Skip(i * gameState.BoardSize).Take(gameState.BoardSize).ToList();
-                    var check = isWinner(gameState, row, i, Direction.Row);
-                    if (!check.HasWinner)
-                    {
-                        var column = new List<char>();
-                        for (int c = i; c < gameState.BoardSize * gameState.BoardSize; c = c + gameState.BoardSize)
-                        {
-                            column.Add(gameState.Board[c]);
-                        }
-                        check = isWinner(gameState, column, i, Direction.Column);
-                    }
-
-                    if (check.HasWinner)
-                    {
-                        return returnGameWon(gameState, check);
-                    }
-                    else
-                    {
-                        if (i == 0)
-                        {
-                            topleftDiag.Add(gameState.Board[0]);
-                            toprightDiag.Add(gameState.Board[gameState.BoardSize - 1]);
-                        }
-                        else
-                        {
-                            topleftDiag.Add(gameState.Board[(i * gameState.BoardSize) + i]);
-                            toprightDiag.Add(gameState.Board[((gameState.BoardSize * i) + (gameState.BoardSize - i) - 1)]);
-                        }
-                    }
-                }
-
-                var diagtopleftCheck = isWinner(gameState, topleftDiag, 0, Direction.TopLeftDiagonal);
-                if (diagtopleftCheck.HasWinner)
-                {
-                    return returnGameWon(gameState, diagtopleftCheck);
-                }
-
-                var diagtoprightCheck = isWinner(gameState, toprightDiag, 0, Direction.TopRightDiagonal);
-                if (diagtoprightCheck.HasWinner)
-                {
-                    return returnGameWon(gameState, diagtoprightCheck);
-                }
-            }
+            gameState = isMoveAWinner(gameState);
+            
+            if (gameState.TurnResult != null && gameState.TurnResult.HasWinner) return gameState;
             if (gameState.Turns == gameState.BoardSize * gameState.BoardSize)
             {
                 gameState.GameOver = true;
@@ -87,22 +40,95 @@ namespace TicTacToeLibrary.Services
             return gameState;
         }
 
-        private IGameState returnGameWon(IGameState gameState, ITurnResult result)
+        private IGameState isMoveAWinner(IGameState gameState)
         {
-            if (result.HasWinner) gameState.GameOver = true;
-            else gameState.GameOver = false;
-            gameState.TurnResult = result;
+            gameState.TurnResult = new TurnResult
+            {
+                HasWinner = false,
+                Winner = null,
+                WinningDirection = Direction.None,
+                WinningIndex = null
+            };
+            // now test if player won
+            if (gameState.Turns > 4)
+            {
+                var topleftDiag = new List<char>();
+                var toprightDiag = new List<char>();
+                for (int i = 0; i < gameState.BoardSize; i++)
+                {
+                    var row = gameState.Board.Skip(i * gameState.BoardSize).Take(gameState.BoardSize).ToList();
+                    if (isWinningLine(gameState, row))
+                    {
+                        gameState.TurnResult = new TurnResult
+                        {
+                            HasWinner = true,
+                            Winner = row.First(),
+                            WinningDirection = Direction.Row,
+                            WinningIndex = i
+                        };
+                    }
+                    else
+                    {
+                        var column = new List<char>();
+                        for (int c = i; c < gameState.BoardSize * gameState.BoardSize; c = c + gameState.BoardSize)
+                        {
+                            column.Add(gameState.Board[c]);
+                        }
+                        if (isWinningLine(gameState, column))
+                        {
+                            gameState.TurnResult = new TurnResult
+                            {
+                                HasWinner = true,
+                                Winner = column.First(),
+                                WinningDirection = Direction.Column,
+                                WinningIndex = i
+                            };
+                        }
+                        else
+                        {
+                            if (i == 0)
+                            {
+                                topleftDiag.Add(gameState.Board[0]);
+                                toprightDiag.Add(gameState.Board[gameState.BoardSize - 1]);
+                            }
+                            else
+                            {
+                                topleftDiag.Add(gameState.Board[(i * gameState.BoardSize) + i]);
+                                toprightDiag.Add(gameState.Board[((gameState.BoardSize * i) + (gameState.BoardSize - i) - 1)]);
+                            }
+                            if (isWinningLine(gameState, topleftDiag))
+                            {
+                                gameState.TurnResult = new TurnResult
+                                {
+                                    HasWinner = true,
+                                    Winner = topleftDiag.First(),
+                                    WinningDirection = Direction.TopLeftDiagonal,
+                                    WinningIndex = 0
+                                };
+                            }
+                            else
+                            {
+                                if (isWinningLine(gameState, toprightDiag))
+                                {
+                                    gameState.TurnResult = new TurnResult
+                                    {
+                                        HasWinner = true,
+                                        Winner = toprightDiag.First(),
+                                        WinningDirection = Direction.TopRightDiagonal,
+                                        WinningIndex = gameState.BoardSize - 1
+                                    };
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             return gameState;
         }
 
-        private TurnResult isWinner(IGameState gameState, List<char> lineToCheck, int index, Direction direction)
+        private bool isWinningLine(IGameState gameState, List<Char> lineToCheck)
         {
-            foreach (var item in gameState.AllowedChars)
-            {
-                var c = lineToCheck.Where(x => x == item);
-                if (c.Count() == gameState.BoardSize) return new TurnResult() { HasWinner = true, Winner = item, WinningDirection = direction, WinningIndex = index };
-            }
-            return new TurnResult() { HasWinner = false, Winner = new char?(), WinningDirection = Direction.None, WinningIndex = new int?() };
-        }
+            return lineToCheck.Count(x => x == gameState.AllowedChars.First()) == gameState.BoardSize || lineToCheck.Count(x => x == gameState.AllowedChars.Last()) == gameState.BoardSize;
+        }        
     }
 }

@@ -20,6 +20,8 @@ namespace TicTacToe
         {
             services.AddSingleton<GameService>();
             services.AddSingleton<ConsoleRenderer>();
+            services.AddSingleton<ConsolePlayerService>();
+            services.AddSingleton<NextMoveOnlyAIService,>
         }
     }
 }

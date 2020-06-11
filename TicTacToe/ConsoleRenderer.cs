@@ -9,11 +9,13 @@ namespace TicTacToe
 {
     public class ConsoleRenderer : IRenderer
     {
-        private readonly IGameService gameService;
+        private readonly IGameService _gameService;
+        private readonly IList<IPlayerService> _playerServices;
 
-        public ConsoleRenderer(IGameService service)
+        public ConsoleRenderer(IGameService service, IList<IPlayerService> playerServices)
         {
-            gameService = service;
+            _gameService = service;
+            _playerServices = playerServices;
         }
 
         public void RenderBoard(IGameState gameState)
@@ -62,7 +64,7 @@ namespace TicTacToe
                     try
                     {
                         Console.WriteLine();
-                        var g = gameService.CreateState(boardSize, null);
+                        var g = _gameService.CreateState(boardSize, null);
                         RenderBoard(g);
                         return g;
                     }
@@ -82,29 +84,16 @@ namespace TicTacToe
 
         public IGameState RenderTurn(IGameState gameState)
         {
-            bool indexParsed = false;
-            while (!indexParsed)
+            try
             {
-                Console.WriteLine($"It's {gameState.CurrentPlayer} turn, enter your index (0-{gameState.Board.Length - 1}): ");
-                var indexChars = Console.ReadLine();
-                int index;
-                indexParsed = Int32.TryParse(indexChars, out index);
-                if (indexParsed)
-                {
-                    try
-                    {
-                        gameState = gameService.PlayerTurn(gameState, index);
-                        RenderBoard(gameState);
-                        return gameState;
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                        indexParsed = false;
-                    }
-                }
+                gameState = _gameService.PlayerTurn(gameState, _playerServices.First(x => x.ServiceForPlayer == gameState.CurrentPlayer).GetPlayerMoveIndex(gameState));
+                RenderBoard(gameState);
             }
-            return null;
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return gameState;
         }
 
         private void renderWin(IGameState gameState)

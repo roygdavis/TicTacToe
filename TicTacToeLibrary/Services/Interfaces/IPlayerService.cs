@@ -5,8 +5,9 @@ using TicTacToeLibrary.Models;
 
 namespace TicTacToeLibrary.Services
 {
-    public interface IAIService
+    public interface IPlayerService
     {
-        int DetermineNextBestMoveIndex(IGameState gameState);
+        char ServiceForPlayer { get; }
+        int GetPlayerMoveIndex(IGameState gameState);
     }
 }

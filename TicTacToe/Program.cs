@@ -1,4 +1,4 @@
-﻿using System;
+﻿using TicTacToe.Services;
 
 namespace TicTacToe
 {
@@ -6,22 +6,12 @@ namespace TicTacToe
     {
         static void Main(string[] args)
         {
-            DrawBoard();
+            var renderer = new RenderingService();
+            var game = new GameService(renderer);
+
+            game.Play();
         }
 
-        static void DrawBoard()
-        {
-            Console.WriteLine("+---+---+---+");
-            for (int x = 0; x < 3; x++)
-            {
-                Console.Write('|');
-                for (int y = 0; y < 3; y++)
-                {
-                    Console.Write("   |");
-                }
-                Console.WriteLine();
-                Console.WriteLine("+---+---+---+");
-            }
-        }
+        
     }
 }
